@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -42,5 +44,20 @@ public class AuthController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/validate")
+    public ResponseEntity<Map<String, Object>> validate(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+
+        boolean valid = jwtUtil.isTokenValid(token);
+        Map<String, Object> result = new HashMap<>();
+        result.put("valid", valid);
+
+        if (valid) {
+            result.put("clientId", jwtUtil.extractSubject(token));
+        }
+
+        return ResponseEntity.ok(result);
     }
 }
